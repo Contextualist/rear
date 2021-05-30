@@ -43,7 +43,7 @@ def scan_once(arch_base, flush=False, rotation_span=5*60):
         dazlist = {} # list of dest archive zip handlers
         for ta in temp.glob("*.zip"):
             # NOTE: time tuples are all in UTC
-            rottime = ts2utc(strptime(ta.stem.split('-')[1], '%y%m%d_%H%M%S'))
+            rottime = ts2utc(strptime(ta.stem.split('-')[-1], '%y%m%d_%H%M%S'))
             if not flush and now - rottime < rotation_span * 1.5: # we wait longer than rotation_span to avoid any delayed release
                 continue
             try:
