@@ -15,19 +15,19 @@ async def scavengerd(arch_base, rotation_span=5*60):
         rotation_span (int): time to switch to a new temp zip, in s; must be the
             same as `rear_fs`'s
     """
-    from .scavenger import scan_once
+    import sys
     import trio
-    from multiprocessing import Process
 
-    def _scan_once(arch_base):
-        # start a process since this is CPU intensive
-        p = Process(target=scan_once, args=(arch_base, False, rotation_span))
-        p.start()
-        p.join()
+    async def _scan_once():
+        with trio.move_on_after(1800) as cs:
+            cs.shield = True # try to wait, even when the main process wants to exit
+            await trio.run_process( # start a process since this is CPU intensive
+                [sys.executable, "-m", "rear.scavenger", "-d", arch_base, "--rotation", str(rotation_span)]
+            )
 
     async def _d():
         while True:
-            await trio.to_thread.run_sync(_scan_once, arch_base)
+            await _scan_once()
             await trio.sleep(rotation_span)
 
     async with trio.open_nursery() as _n:

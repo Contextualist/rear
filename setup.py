@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="rear",
-    version="0.1.0",
+    version="0.1.1",
     author="Contextualist",
     description="Remote Archiver: safely collect output files into archives on network filesystem",
     long_description=long_description,
