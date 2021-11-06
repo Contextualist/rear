@@ -24,7 +24,7 @@ def ar_size_cap(ar):
     ar.rename(ar1)
     print(f"mv {ar} {ar1}")
 
-def scan_once(arch_base, flush=False, rotation_span=5*60):
+def try_scan_once(arch_base, flush=False, rotation_span=5*60):
     arch_base = Path(arch_base)
     temp = arch_base/"inbox"
     temp.mkdir(exist_ok=True)
@@ -34,14 +34,16 @@ def scan_once(arch_base, flush=False, rotation_span=5*60):
     if not flush and lockf.exists() and now - lockf.stat().st_mtime < rotation_span:
         return
     try:
-        lock = FileLock(lockf, timeout=0.01)
+        with FileLock(lockf, timeout=0.01):
+            _scan_once(arch_base, now, flush, rotation_span)
     except Timeout:
-        return
+        pass
 
+def _scan_once(arch_base, now, flush=False, rotation_span=5*60):
     stat_fi, stat_ta, stat_da = 0, 0, 0
-    with lock, ExitStack() as ar_cm:
+    with ExitStack() as ar_cm:
         dazlist = {} # list of dest archive zip handlers
-        for ta in temp.glob("*.zip"):
+        for ta in (arch_base/"inbox").glob("*.zip"):
             # NOTE: time tuples are all in UTC
             rottime = ts2utc(strptime(ta.stem.split('-')[-1], '%y%m%d_%H%M%S'))
             if not flush and now - rottime < rotation_span * 1.5: # we wait longer than rotation_span to avoid any delayed release
@@ -85,6 +87,6 @@ def main():
     argp.add_argument('--flush', action='store_true', help="transfer all files within the inbox; caution: use it only when all temp archives are closed")
     argp.add_argument('--rotation', type=int, default=5*60, help="time to switch to a new temp zip, in s; must be the same as `rear_fs`'s (default: 300)")
     carg = argp.parse_args()
-    scan_once(carg.d, carg.flush, carg.rotation)
+    try_scan_once(carg.d, carg.flush, carg.rotation)
 if __name__ == "__main__":
     main()

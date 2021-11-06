@@ -14,7 +14,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     python_requires=">=3.8",
     install_requires=[
-        "filelock",
+        "filelock >= 3.3.2",
         "trio",
     ],
     tests_require = [
