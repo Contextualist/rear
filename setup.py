@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="rear",
-    version="0.1.1",
+    version="0.1.2",
     author="Contextualist",
     description="Remote Archiver: safely collect output files into archives on network filesystem",
     long_description=long_description,
@@ -31,6 +31,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Topic :: System :: Archiving",
         "Topic :: System :: Distributed Computing",
         "Topic :: Utilities",

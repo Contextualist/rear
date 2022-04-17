@@ -14,7 +14,7 @@ async def rear_fs(arch_base, success_only=True, rotation_span=5*60):
     e.g.::
 
         async with rear_fs("/path/to/archive_base"):
-            with rear_open("ar.zip/relpath/to/file", 'w+b') as f: 
+            with rear_open("ar.zip/relpath/to/file", 'w+b') as f:
                 f.write(b"Hello world") # Write buffers all content
             # Closing file flushes all of the buffer to a tmp archive
 
@@ -30,10 +30,10 @@ async def rear_fs(arch_base, success_only=True, rotation_span=5*60):
     async def _rotated():
         nonlocal _ar
         while True:
+            await trio.sleep(rotation_span)
             if _ar:
                 _ar.close()
                 _ar = None
-            await trio.sleep(rotation_span)
 
     def _get_ar():
         nonlocal _ar
